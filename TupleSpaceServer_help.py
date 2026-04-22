@@ -99,6 +99,14 @@ def handle_client(client_socket):
 
             # TASK 2: Build the response string with its size prepended (3 digits + space),
             # then send it. Hint: total size = len(response) + 4. Use sendall().
+            
+            #Convert response text to bytes
+            response_bytes = response.encode('utf-8')
+            #Get byte length of response
+            response_size = len(response_bytes)
+            #Format size into 3 digits (pad 0 if needed), then encode to bytes
+            size_header = f"{response_size:03d}".encode('utf-8')
+            client_socket.sendall(size_header + b'' + response_bytes)
 
     except (socket.error, ValueError):
         pass
