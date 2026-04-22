@@ -141,7 +141,7 @@ def handle_request(message):
             if key in tuple_space:
                 # Key exists: get the corresponding value
                 value = tuple_space[key]
-                return f"ok ({key},{value}) read"
+                return f"OK ({key},{value}) read"
             else:
                 # Key does not exist
                 return f"ERR {key} does not exist"
@@ -151,6 +151,14 @@ def handle_request(message):
             # Return "OK (<key>, <value>) removed" or "ERR <key> does not exist".
             # Hint: dict.pop(key, None) removes and returns the value, or None if missing.
             increment_stat("get_count")
+            # Remove key from tuple_space and return its value
+            value = tuple_space.pop(key, None)
+            # Check if value is not None
+            if value is not None:
+                return f"OK ({key},{value}) remove"
+            else:
+                # Key does not exist, return error response
+                return f"ERR {key} does not exist"
 
 
         elif op == "P":
