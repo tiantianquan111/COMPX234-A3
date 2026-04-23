@@ -21,6 +21,15 @@ def main():
     # TASK 1: Create a TCP/IP socket and connect it to the server.
     # Hint: socket.socket(socket.AF_INET, socket.SOCK_STREAM) creates the socket.
     # Then call sock.connect((hostname, port)) to connect.
+    
+    sock = socket.socket(socket.AF_INET, socket)
+    try:
+        # Attempt to connect to the server at the specified hostname and port
+        sock.connect((hostname, port))
+        # Catch all socket-related errors 
+    except socket.error as e:
+        print(f"Connection error:{e}")
+        sys.exit(1)
 
 
     try:
