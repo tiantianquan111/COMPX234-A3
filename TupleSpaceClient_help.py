@@ -49,6 +49,30 @@ def main():
             # X is "R" for READ and "G" for GET.
             # Hint: for READ/GET, size = 6 + len(key). For PUT, size = 7 + len(key) + len(value).
             # Reject lines with invalid format or key+" "+value > 970 chars.
+            
+            # Check if the current command is "READ"
+            if cmd == "READ":
+                # Calculate total length
+                total_len = 6 + len(key)
+                content = f"R {key}"
+            # Check if the current command is "GET"
+            elif cmd == "GET":
+                # Calculate total length
+                total_len = 6 + len(key)
+                content = f"G {key}"
+            # Check if the current command is "PUT"
+            elif cmd =="PUT":
+                # Calculate total length
+                total_len = 7 + len(key) + len(value)
+                content = f"P {key} {value}"
+            # Length limit check
+            key_value_str = f"{key} {value}"
+            if len(key_value_str) > 970 or total_len > 999:
+                print(f"{line}:ERR message too long")
+                continue
+            # Format the total length into a 3-digit string with leading zeros
+            len_str = f"{total_len:03d}"
+            message = len_str + content
 
 
             # TASK 3: Send the message to the server, then receive the response.
