@@ -77,7 +77,7 @@ def handle_client(client_socket):
             # Hint: use receive_n(). If nothing arrives, client disconnected — break.
 
             #Read exactly 3 bytes from the client socket, which represents the message length
-            size_bytrs = receive_n(client_socket,3)
+            size_bytes = receive_n(client_socket,3)
             # Check if any bytes were received
             if not size_bytes:
                 break
@@ -89,7 +89,7 @@ def handle_client(client_socket):
                 break
 
             #Read exactly msg_size bytes from the client socket as the complete message content
-            message_data = recive_n(client_socket,msg_size-3)
+            message_data = receive_n(client_socket, msg_size - 3)
             if not message_data:
                 break
             message_buffer = message_data.decode('utf-8')
@@ -106,7 +106,7 @@ def handle_client(client_socket):
             response_size = len(response_bytes)
             #Format size into 3 digits (pad 0 if needed), then encode to bytes
             size_header = f"{response_size:03d}".encode('utf-8')
-            client_socket.sendall(size_header + b'' + response_bytes)
+            client_socket.sendall(size_header + response_bytes)
 
     except (socket.error, ValueError):
         pass
@@ -155,7 +155,7 @@ def handle_request(message):
             value = tuple_space.pop(key, None)
             # Check if value is not None
             if value is not None:
-                return f"OK ({key},{value}) remove"
+                return f"OK ({key},{value}) removed"
             else:
                 # Key does not exist, return error response
                 return f"ERR {key} does not exist"

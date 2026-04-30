@@ -1,0 +1,12 @@
+PUT Manchester-United 20
+PUT Liverpool 19
+PUT Arsenal 31
+PUT Everton 9
+PUT Manchester-City 9
+READ Liverpool
+READ Arsenal
+PUT Arsenal 13
+GET Arsenal
+PUT Arsenal 13
+GET Manchester-United
+READ Manchester-United

@@ -22,7 +22,7 @@ def main():
     # Hint: socket.socket(socket.AF_INET, socket.SOCK_STREAM) creates the socket.
     # Then call sock.connect((hostname, port)) to connect.
     
-    sock = socket.socket(socket.AF_INET, socket)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         # Attempt to connect to the server at the specified hostname and port
         sock.connect((hostname, port))
@@ -49,22 +49,43 @@ def main():
             # X is "R" for READ and "G" for GET.
             # Hint: for READ/GET, size = 6 + len(key). For PUT, size = 7 + len(key) + len(value).
             # Reject lines with invalid format or key+" "+value > 970 chars.
-            
+            key = ""  
+            value = ""
             # Check if the current command is "READ"
             if cmd == "READ":
+                if len(parts) < 2: 
+                     print(f"{line}: ERR invalid format")
+                     continue
+                key = parts[1]
                 # Calculate total length
                 total_len = 6 + len(key)
                 content = f"R {key}"
+
             # Check if the current command is "GET"
             elif cmd == "GET":
+                if len(parts) < 2:  
+                     print(f"{line}: ERR invalid format")
+                     continue
+                key = parts[1]
                 # Calculate total length
                 total_len = 6 + len(key)
                 content = f"G {key}"
+
             # Check if the current command is "PUT"
             elif cmd =="PUT":
+                if len(parts) < 3: 
+                    print(f"{line}: ERR invalid format")
+                    continue
+                key = parts[1]
+                value = parts[2] 
                 # Calculate total length
                 total_len = 7 + len(key) + len(value)
                 content = f"P {key} {value}"
+
+            else:
+                print(f"{line}: ERR unknown command")
+                continue
+            
             # Length limit check
             key_value_str = f"{key} {value}"
             if len(key_value_str) > 970 or total_len > 999:
@@ -81,16 +102,13 @@ def main():
             #            Then read the remaining (size - 3) bytes to get the response body.
 
             sock.sendall(message.encode())
+            sock.settimeout(3)  
+            sock.sendall(message.encode())
+
             resp_len_bytes = sock.recv(3)
-            # If no bytes are received, the server has closed the connection
-            if not resp_len_bytes:
-                print(f"{line}: ERR server closed connection")
-                break
-            # Decode the received 3-byte length header to string, then convert to integer to get the total response length
             resp_len = int(resp_len_bytes.decode())
-            # Read the remaining content: total length - 3
-            response_buffer = sock.recv(resp_len - 3)
-            response = response_buffer.decode().strip()
+            response = sock.recv(resp_len - 3).decode().strip()
+
             print(f"{line}: {response}")
 
     except (socket.error, ValueError) as e:
