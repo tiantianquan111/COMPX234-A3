@@ -88,12 +88,15 @@ def main():
             
             # Length limit check
             key_value_str = f"{key} {value}"
-            if len(key_value_str) > 970 or total_len > 999:
+            if cmd == "PUT" and len(f"{key} {value}") > 970:
                 print(f"{line}:ERR message too long")
+                continue
+            if total_len > 999:
+                print(f"{line}: ERR message too long")
                 continue
             # Format the total length into a 3-digit string with leading zeros
             len_str = f"{total_len:03d}"
-            message = len_str + content
+            message = f"{len_str} {content}"
 
 
             # TASK 3: Send the message to the server, then receive the response.
@@ -101,13 +104,16 @@ def main():
             # - Receive: first read 3 bytes to get the response size (like the server does).
             #            Then read the remaining (size - 3) bytes to get the response body.
 
+            # Send the encoded message to the server
             sock.sendall(message.encode())
-            sock.settimeout(3)  
-            sock.sendall(message.encode())
-
+            # Receive the first 3 bytes to get the length of the response
             resp_len_bytes = sock.recv(3)
+            # If no data is received (server closed the connection), break the loop
+            if not resp_len_bytes:
+                 break
+            # Decode the 3 bytes and convert to an integer to get the actual response length
             resp_len = int(resp_len_bytes.decode())
-            response = sock.recv(resp_len - 3).decode().strip()
+            response = sock.recv(resp_len).decode().strip()
 
             print(f"{line}: {response}")
 

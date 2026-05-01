@@ -92,7 +92,7 @@ def handle_client(client_socket):
             message_data = receive_n(client_socket, msg_size - 3)
             if not message_data:
                 break
-            message_buffer = message_data.decode('utf-8')
+            message_buffer = message_data.decode('utf-8').strip()
         
             # Handle the request
             response = handle_request(message_buffer)
@@ -103,10 +103,10 @@ def handle_client(client_socket):
             #Convert response text to bytes
             response_bytes = response.encode('utf-8')
             #Get byte length of response
-            response_size = len(response_bytes)
-            #Format size into 3 digits (pad 0 if needed), then encode to bytes
-            size_header = f"{response_size:03d}".encode('utf-8')
-            client_socket.sendall(size_header + response_bytes)
+            total_len = len(response_bytes)
+            size_str = f"{total_len:03d}"
+            full_msg = size_str + response
+            client_socket.sendall(full_msg.encode('utf-8'))
 
     except (socket.error, ValueError):
         pass
@@ -141,7 +141,7 @@ def handle_request(message):
             if key in tuple_space:
                 # Key exists: get the corresponding value
                 value = tuple_space[key]
-                return f"OK ({key},{value}) read"
+                return f"OK ({key}, {value}) read"
             else:
                 # Key does not exist
                 return f"ERR {key} does not exist"
